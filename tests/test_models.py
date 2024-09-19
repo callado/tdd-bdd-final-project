@@ -181,6 +181,25 @@ class TestProductModel(unittest.TestCase):
         self.assertIsNone(fetched_product)
         self.assertEqual(len(Product.all()), 0)
 
+    def test_serialize_deserialize(self):
+        """It should Serialize and deserialize without changing fields"""
+        product = ProductFactory()
+        product.Id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+
+        serialized = product.serialize()
+        self.assertNotEqual(serialized, {})
+
+        deserialized = ProductFactory()
+        deserialized.deserialize(serialized)
+        
+        self.assertEqual(product.name, deserialized.name)
+        self.assertEqual(product.description, deserialized.description)
+        self.assertEqual(product.price, deserialized.price)
+        self.assertEqual(product.available, deserialized.available)
+        self.assertEqual(product.category, deserialized.category)
+
     def test_list_all_products(self):
         """It should List all products"""
         products = Product.all()
