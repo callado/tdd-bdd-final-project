@@ -180,3 +180,18 @@ class TestProductModel(unittest.TestCase):
 
         products = Product.all()
         self.assertEqual(len(products), 5)
+
+    def test_find_product_by_name(self):
+        """It should Find products by name"""
+        new_products = [ProductFactory() for _ in range(5)]
+        for product in new_products:
+            product.create()
+
+        name = new_products[0].name
+        count_occurrences = len([p for p in new_products if p.name == name])
+
+        found_products = Product.find_by_name(name)
+        self.assertEqual(found_products.count(), count_occurrences)
+        for product in found_products:
+            self.assertEqual(product.name, name)
+    
