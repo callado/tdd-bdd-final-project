@@ -112,7 +112,7 @@ class TestProductModel(unittest.TestCase):
         product.id = None
         product.create()
         self.assertIsNotNone(product.id)
-        
+
         # Act
         read_product = Product.find(product.id)
 
@@ -128,7 +128,7 @@ class TestProductModel(unittest.TestCase):
         """It should Update a product in the database"""
         # Arrange
         self.assertEqual(len(Product.all()), 0)
-        
+
         product = ProductFactory()
         app.logger.info("Generated product: %s", vars(product))
         product.id = None
@@ -152,3 +152,19 @@ class TestProductModel(unittest.TestCase):
         fetched_product = Product.find(product.id)
         self.assertEqual(fetched_product.id, original_product_id)
         self.assertEqual(fetched_product.description, new_description)
+
+    def test_delete_a_product(self):
+        """It should Delete a product from the database"""
+        product = ProductFactory()
+        product.id = None
+        product.create()
+
+        self.assertIsNotNone(product.id)
+        original_product_id = product.id
+        self.assertEqual(len(Product.all()), 1)
+
+        product.delete()
+
+        fetched_product = Product.find(original_product_id)
+        self.assertIsNone(fetched_product)
+        self.assertEqual(len(Product.all()), 0)
