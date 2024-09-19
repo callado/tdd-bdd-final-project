@@ -143,9 +143,12 @@ class TestProductModel(unittest.TestCase):
         new_description = "Actually, this is not a very good product"
         product.description = new_description
         product.update()
-        read_product = Product.find(product.id)
 
         # Assert
-        self.assertEqual(read_product.id, original_product_id)
-        self.assertEqual(read_product.description, new_description)
+        self.assertEqual(product.id, original_product_id)
+        self.assertEqual(product.description, new_description)
+
         self.assertEqual(len(Product.all()), 1)
+        fetched_product = Product.find(product.id)
+        self.assertEqual(fetched_product.id, original_product_id)
+        self.assertEqual(fetched_product.description, new_description)
