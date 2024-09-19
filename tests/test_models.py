@@ -152,7 +152,7 @@ class TestProductModel(unittest.TestCase):
         fetched_product = Product.find(product.id)
         self.assertEqual(fetched_product.id, original_product_id)
         self.assertEqual(fetched_product.description, new_description)
-    
+
     def test_update_with_no_id(self):
         """It should Fail an update request if the product ID is None"""
         product = ProductFactory()
@@ -193,7 +193,7 @@ class TestProductModel(unittest.TestCase):
 
         deserialized = ProductFactory()
         deserialized.deserialize(serialized)
-        
+
         self.assertEqual(product.name, deserialized.name)
         self.assertEqual(product.description, deserialized.description)
         self.assertEqual(product.price, deserialized.price)
@@ -203,7 +203,7 @@ class TestProductModel(unittest.TestCase):
     def test_deserialize_with_invalid_boolean(self):
         """It should Fail deserialization when availability is a non-boolean type"""
         product = ProductFactory()
-        
+
         serialized = product.serialize()
         self.assertNotEqual(serialized, {})
 
@@ -215,7 +215,7 @@ class TestProductModel(unittest.TestCase):
     def test_deserialize_with_invalid_category(self):
         """It should Fail deserialization when an invalid category name is passed"""
         product = ProductFactory()
-        
+
         serialized = product.serialize()
         self.assertNotEqual(serialized, {})
 
@@ -227,8 +227,17 @@ class TestProductModel(unittest.TestCase):
     def test_deserialize_with_no_data(self):
         """It should Fail deserialization when no data is passed"""
         product = ProductFactory()
-        
+
         serialized = {}
+
+        with self.assertRaises(DataValidationError):
+            product.deserialize(serialized)
+
+    def test_deserialize_with_non_dict_data(self):
+        """It should Fail deserialization when input is not a dict"""
+        product = ProductFactory()
+
+        serialized = {"a", 2, True}
 
         with self.assertRaises(DataValidationError):
             product.deserialize(serialized)
@@ -236,7 +245,7 @@ class TestProductModel(unittest.TestCase):
     def test_deserialize_with_missing_field(self):
         """It should Fail deserialization when a field is missing"""
         product = ProductFactory()
-        
+
         serialized = product.serialize()
         self.assertNotEqual(serialized, {})
 
@@ -312,7 +321,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(found_products.count(), count_occurrences)
         for product in found_products:
             self.assertEqual(product.price, price)
-    
+
     def test_find_by_price_str(self):
         """It should Find products by price when price is passed as a string"""
         products = [ProductFactory() for _ in range(10)]
