@@ -28,6 +28,7 @@ import os
 import logging
 from decimal import Decimal
 from unittest import TestCase
+from urllib.parse import quote_plus
 from service import app
 from service.common import status
 from service.models import db, init_db, Product
@@ -216,6 +217,36 @@ class TestProductRoutes(TestCase):
         """It should Fail to update a product with invalid ID"""
         response = self.client.delete(f"{BASE_URL}/1234")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_list_all(self):
+        """It should List all products"""
+        num_products = 5
+        self._create_products(count=num_products)
+        self.assertEqual(self.get_product_count(), num_products)
+
+    def test_list_by_name(self):
+        """It should fetch all products by name"""
+        products = self._create_products(5)
+        test_name = products[0].name
+        name_count = len([product for product in products if product.name == test_name])
+        response = self.client.get(BASE_URL, query_string=f"name={quote_plus(test_name)}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_json = response.get_json()
+        self.assertEqual(len(response_json), name_count)
+        for product in response_json:
+            self.assertEqual(product["name"], test_name)
+
+    def test_list_by_category(self):
+        """It should fetch all products by category"""
+        products = self._create_products(5)
+        test_category = products[0].category.name
+        category_count = len([product for product in products if product.category.name == test_category])
+        response = self.client.get(BASE_URL, query_string=f"category={quote_plus(test_category)}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_json = response.get_json()
+        self.assertEqual(len(response_json), category_count)
+        for product in response_json:
+            self.assertEqual(product["category"], test_category)
 
     ######################################################################
     # Utility functions
