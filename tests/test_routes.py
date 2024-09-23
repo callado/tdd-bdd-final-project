@@ -175,8 +175,8 @@ class TestProductRoutes(TestCase):
         self.assertEqual(Decimal(response_json["price"]), test_product.price)
         self.assertEqual(response_json["available"], test_product.available)
         self.assertEqual(response_json["category"], test_product.category.name)
-    
-    def test_read_product(self):
+
+    def test_read_product_invalid_id(self):
         """It should Fail when trying to get a non-existent product"""
         response = self.client.get(f"{BASE_URL}/1234")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
